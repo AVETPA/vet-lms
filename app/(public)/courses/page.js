@@ -1,9 +1,9 @@
-// app/courses/page.tsx or similar
+// app/(public)/courses/page.js
 
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server'; // adjust path to your server client
+import { supabase } from '@/lib/supabaseClient'; // adjust path if needed
 
-function formatPrice(priceCents: number | null | undefined, currency: string | null | undefined) {
+function formatPrice(priceCents, currency) {
   if (!priceCents || priceCents === 0) return 'Free';
   const value = priceCents / 100;
   return new Intl.NumberFormat('en-AU', {
@@ -13,11 +13,11 @@ function formatPrice(priceCents: number | null | undefined, currency: string | n
 }
 
 export default async function CoursesPage() {
-  const supabase = createClient();
-
   const { data: courses, error } = await supabase
     .from('courses')
-    .select('id, slug, title, subtitle, short_description, thumbnail_url, price_cents, currency, is_published, pricing_type')
+    .select(
+      'id, slug, title, subtitle, short_description, thumbnail_url, price_cents, currency, is_published, pricing_type'
+    )
     .eq('is_published', true)
     .order('created_at', { ascending: false });
 
@@ -65,7 +65,7 @@ export default async function CoursesPage() {
                   {formatPrice(course.price_cents, course.currency)}
                 </span>
                 <span className="text-slate-500">
-                  {course.pricing_type === 'free' ? 'Workshop' : 'Paid workshop'}
+                  {course.pricing_type === 'free' ? 'Online workshop' : 'Paid workshop'}
                 </span>
               </div>
             </div>
